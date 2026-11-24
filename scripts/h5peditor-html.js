@@ -351,8 +351,12 @@ ns.Html.prototype.getCKEditorConfig = function () {
       colors.push('fontColor');
       config.plugins.push('FontColor');
 
+      // Keep exact hex on reopen (default HSL round-trip can drift, e.g. #223C6A -> #223B68).
+      config.fontColor = {
+        colorPicker: { format: 'hex' }
+      };
       if (this.field.font.color instanceof Array) {
-        config.fontColor = { colors: getColors(this.field.font.color) };
+        config.fontColor.colors = getColors(this.field.font.color);
       }
     }
 
@@ -361,8 +365,11 @@ ns.Html.prototype.getCKEditorConfig = function () {
       colors.push('fontBackgroundColor');
       config.plugins.push('FontBackgroundColor');
 
+      config.fontBackgroundColor = {
+        colorPicker: { format: 'hex' }
+      };
       if (this.field.font.background instanceof Array) {
-        config.fontBackgroundColor = { colors: getColors(this.field.font.color) };
+        config.fontBackgroundColor.colors = getColors(this.field.font.background);
       }
     }
 
