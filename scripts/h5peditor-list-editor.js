@@ -709,16 +709,27 @@ H5PEditor.ListEditor = (function ($) {
       H5PEditor.createButton(
         'remove', H5PEditor.t('core', 'removeItem'), function () {
           confirmHandler(item, $item.index(), $(this).offset(), function () {
+            // Destroy active CKEditor before tearing down the row
+            H5PEditor.Html.removeWysiwyg();
             list.removeItem($item.index());
           });
         }
       ).appendTo($listActions);
 
-      list.on('removedItem', (event) => {
-        if (event.data !== $item.index()) {
+      // Match by field identity, not DOM index. After splice, sibling indexes
+      // shift: using $item.index() made later rows match the removed index and
+      // cascade-hide themselves (data stayed; UI vanished until reopen).
+      list.on('removedItem', () => {
+        var stillInList = false;
+        list.forEachChild(function (child) {
+          if (child === item) {
+            stillInList = true;
+          }
+        });
+        if (stillInList) {
           return;
         }
-        
+
         $item.remove();
 
         if (!(list.getValue() ?? []).length) {
